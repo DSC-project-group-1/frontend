@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { useToast } from "@/hooks/use-toast"
-import { BACKEND_URL } from '@/components/AudioRecorder'
+import axios from 'axios'
 
 export function useAudioRecorder() {
   const [isRecording, setIsRecording] = useState(false)
@@ -11,6 +11,8 @@ export function useAudioRecorder() {
   const chunksRef = useRef<Blob[]>([])
   const timerRef = useRef<number>()
   const { toast } = useToast()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [stats, setStats] = useState<any>(null);
 
   const startRecording = async () => {
     try {
@@ -61,20 +63,9 @@ export function useAudioRecorder() {
       const formData = new FormData() 
       formData.append('audio', wavBlob, 'recording.wav') 
   
-      const response = await fetch(`http://localhost:5000/api/audio/upload-audio`, { 
-        method: 'POST', 
-        body: formData, 
-      }) 
-  
-      if (response.ok) { 
-        toast({ 
-          title: "Success!", 
-          description: "Audio uploaded successfully", 
-        }) 
-        setAudioBlob(null) 
-      } else { 
-        throw new Error('Upload failed') 
-      } 
+      const response = await axios.post(`http://localhost:5000/api/audio/upload-audio`, formData)
+      setStats(response.data)
+      console.log(response.data)
     } catch (error) { 
       console.log(error); 
       toast({ 
@@ -206,5 +197,6 @@ export function useAudioRecorder() {
     stopRecording,
     uploadRecording,
     formatTime,
+    stats,
   }
 }

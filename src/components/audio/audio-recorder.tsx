@@ -2,6 +2,8 @@ import { useAudioRecorder } from "@/hooks/use-audio-recorder"
 import { AudioControls } from "./audio-controls"
 import { RecordingProgress } from "./recording-progress"
 import { PermissionDialog } from "./permission-dialog"
+import { PieChart, Pie, Tooltip, Cell } from 'recharts'
+import { useState } from "react"
 
 export function AudioRecorder() {
   const {
@@ -14,7 +16,19 @@ export function AudioRecorder() {
     stopRecording,
     uploadRecording,
     formatTime,
+    stats,
   } = useAudioRecorder()
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+
+  const onPieEnter = (_: unknown, index: number) => {
+    setActiveIndex(index);
+  };
+
+  const data = stats?.probabilities && Object.entries(stats.probabilities).map(([emotion, probability]) => ({
+    name: emotion,
+    students: Math.round(probability as number * 1000)
+  }));
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-background to-muted p-4">
@@ -53,6 +67,37 @@ export function AudioRecorder() {
         open={showPermissionDialog}
         onOpenChange={setShowPermissionDialog}
       />
+
+      {stats?.probabilities && (
+        <>
+          <h2>All Emotion Probabilities:</h2>
+          <ul>
+            {Object.entries(stats.probabilities).map(([emotion, probability]) => (
+              <li key={emotion}>
+                {emotion}: {Math.round(probability as number * 100)}%
+              </li>
+            ))}
+          </ul>
+        </>)}
+
+      {stats?.probabilities &&
+        <PieChart width={700} height={700}>
+          <Pie
+            activeIndex={activeIndex}
+            data={data}
+            dataKey="students"
+            outerRadius={250}
+            fill="green"
+            onMouseEnter={onPieEnter}
+            style={{ cursor: 'pointer', outline: 'none' }} // Ensure no outline on focus
+          >
+            {data.map((_: unknown, index: number) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+          <Tooltip />
+        </PieChart>
+      }
     </div>
   )
 }
