@@ -1,174 +1,100 @@
 
-export function LeaderboardPage() {
-    return (
-        <div>
-            <h1>Leaderboard Page</h1>
-        </div>
-    );
-};
-
-
-
-
-//three.js animation
-
-// import { useNavigate } from 'react-router-dom';
-// import * as THREE from 'three';
-// import { BoxLineGeometry } from 'three/addons/geometries/BoxLineGeometry.js';
-// import { XRButton } from 'three/addons/webxr/XRButton.js';
-// import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
-// import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
-// import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-// import { LandingPage } from './pages/LandingPage.jsx'; 
-
-// export default function HomePage() {
-//   const navigate = useNavigate(); 
-//   let camera, scene, renderer;
-//   let controller1, controller2;
-//   let controllerGrip1, controllerGrip2;
-
-//   let room, spheres, physics;
-//   const velocity = new THREE.Vector3();
-
-//   let count = 0;
-
-//   init();
-//   await initPhysics();
-
-//   function init() {
-//     scene = new THREE.Scene();
-//     scene.background = new THREE.Color(0x505050);
-
-//     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 50);
-//     camera.position.set(0, 1.6, 3);
-
-//     room = new THREE.LineSegments(
-//       new BoxLineGeometry(6, 6, 6, 10, 10, 10),
-//       new THREE.LineBasicMaterial({ color: 0x808080 })
+// export function LeaderboardPage() {
+//     return (
+//         <div>
+//             <h1>Leaderboard Page</h1>
+//         </div>
 //     );
-//     room.geometry.translate(0, 3, 0);
-//     scene.add(room);
+// };
 
-//     scene.add(new THREE.HemisphereLight(0xbbbbbb, 0x888888, 3));
+ 
+import React from "react";
+import { Doughnut, Bar } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from "chart.js";
+import { useNavigate } from "react-router-dom";
 
-//     const light = new THREE.DirectionalLight(0xffffff, 3);
-//     light.position.set(1, 1, 1).normalize();
-//     scene.add(light);
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
-//     // Renderer setup
-//     renderer = new THREE.WebGLRenderer({ antialias: true });
-//     renderer.setPixelRatio(window.devicePixelRatio);
-//     renderer.setSize(window.innerWidth, window.innerHeight);
-//     renderer.setAnimationLoop(animate);
-//     renderer.xr.enabled = true;
-//     document.body.appendChild(renderer.domElement);
+export default function LeaderboardPage() {
+  const navigate = useNavigate(); // For navigation to home page
 
-//     const controls = new OrbitControls(camera, renderer.domElement);
-//     controls.maxDistance = 10;
-//     controls.target.y = 1.6;
-//     controls.update();
+  // Doughnut Chart Data (Player percentage)
+  const doughnutData = {
+    labels: ["Player 1", "Player 2"],
+    datasets: [
+      {
+        data: [55, 45], // Player percentages
+        backgroundColor: ["#4CAF50", "#FF5733"],
+        hoverBackgroundColor: ["#66BB6A", "#FF7043"],
+      },
+    ],
+  };
 
-//     document.body.appendChild(XRButton.createButton(renderer, {
-//       'optionalFeatures': ['depth-sensing'],
-//       'depthSensing': { 'usagePreference': ['gpu-optimized'], 'dataFormatPreference': [] }
-//     }));
+  // Bar Chart Data (Statistics)
+  const barData = {
+    labels: ["Score", "Accuracy", "Time Played", "Challenges Won"],
+    datasets: [
+      {
+        label: "Player 1",
+        backgroundColor: "#4CAF50",
+        data: [85, 78, 120, 30], // Sample data for Player 1
+      },
+      {
+        label: "Player 2",
+        backgroundColor: "#FF5733",
+        data: [65, 90, 95, 20], // Sample data for Player 2
+      },
+    ],
+  };
 
-//     // Controllers and event handling
+  // Emoji emotions and captions
+  const emotions = [
+    { emoji: "😄", label: "Happy" },
+    { emoji: "😐", label: "Neutral" },
+    { emoji: "😞", label: "Sad" },
+    { emoji: "😡", label: "Angry" },
+    { emoji: "😢", label: "Crying" },
+  ];
 
-//     window.addEventListener('resize', onWindowResize);
-//   }
+  return (
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center p-4 space-y-8">
+      {/* Header */}
+      <h1 className="text-4xl font-bold text-center mt-4">Game Results Page</h1>
 
-//   function buildController(data) {
-//     let geometry, material;
+      {/* Charts Section */}
+      <div className="w-full flex flex-wrap justify-center gap-8">
+        {/* Doughnut Chart */}
+        <div className="w-1/3 bg-gray-800 p-6 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-semibold text-center mb-4">Player Percentages</h2>
+          <Doughnut data={doughnutData} />
+        </div>
 
-//     switch (data.targetRayMode) {
-//       case 'tracked-pointer':
-//         geometry = new THREE.BufferGeometry();
-//         geometry.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0, 0, 0, -1], 3));
-//         geometry.setAttribute('color', new THREE.Float32BufferAttribute([0.5, 0.5, 0.5, 0, 0, 0], 3));
+        {/* Bar Chart */}
+        <div className="w-2/3 bg-gray-800 p-6 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-semibold text-center mb-4">Game Statistics</h2>
+          <Bar data={barData} />
+        </div>
+      </div>
 
-//         material = new THREE.LineBasicMaterial({ vertexColors: true, blending: THREE.AdditiveBlending });
+      {/* Emoji Section */}
+      <div className="w-full flex justify-around items-center mt-6">
+        {emotions.map((emotion, index) => (
+          <div key={index} className="flex flex-col items-center space-y-2">
+            <div className="text-5xl">{emotion.emoji}</div>
+            <div className="text-lg font-semibold">{emotion.label}</div>
+          </div>
+        ))}
+      </div>
 
-//         return new THREE.Line(geometry, material);
-
-//       case 'gaze':
-//         geometry = new THREE.RingGeometry(0.02, 0.04, 32).translate(0, 0, -1);
-//         material = new THREE.MeshBasicMaterial({ opacity: 0.5, transparent: true });
-//         return new THREE.Mesh(geometry, material);
-//     }
-//   }
-
-//   function onWindowResize() {
-//     camera.aspect = window.innerWidth / window.innerHeight;
-//     camera.updateProjectionMatrix();
-//     renderer.setSize(window.innerWidth, window.innerHeight);
-//   }
-
-//   async function initPhysics() {
-//     physics = await RapierPhysics();
-
-//     // Floor and Walls
-//     const geometry = new THREE.BoxGeometry(6, 2, 6);
-//     const material = new THREE.MeshNormalMaterial({ visible: false });
-
-//     const floor = new THREE.Mesh(geometry, material);
-//     floor.position.y = -1;
-//     floor.userData.physics = { mass: 0 };
-//     scene.add(floor);
-
-//     // Add more physics setup for walls, spheres, etc...
-//     // Refer to your physics setup code for objects like walls, spheres, etc.
-//   }
-
-//   function handleController(controller) {
-//     if (controller.userData.isSelecting) {
-//       // Handle physics and controller interaction
-//     }
-//   }
-
-//   function animate() {
-//     handleController(controller1);
-//     handleController(controller2);
-
-//     renderer.render(scene, camera);
-//   }
-
-//   const goToLandingPage = () => {
-//     navigate('/landing'); 
-//   };
-
-//   return (
-//     <div>
-//       <button onClick={goToLandingPage} className="go-to-landing-button">
-//         Go to Landing Page
-//       </button>
-//     </div>
-//   );
-// }
-
-
-// <!-- <style>
-// 			.landingPage-btn{
-// 				background-color: #FF5733; 
-//                 color: white; 
-//                 font-size: 18px;
-//                 padding: 15px 30px; 
-//                 border: none;
-//                 border-radius: 15px; 
-//                 text-align: center;
-//                 text-transform: uppercase;
-//                 font-weight: bold;
-//                 box-shadow: 0 6px #999, 0 3px 5px rgba(0, 0, 0, 0.2);
-//                 transition: all 0.3s ease; 
-//                 cursor: pointer;
-// 			}
-//             .landingPage-btn:hover {
-//                 background-color: #e44d26; /* Slightly darker red on hover */
-//                 box-shadow: 0 12px 15px rgba(0, 0, 0, 0.2); /* More intense shadow on hover */
-//                 transform: translateY(-5px); /* Lift the button when hovered */
-//             }
-//             .landingPage-btn:active {
-//              box-shadow: 0 3px #666;
-//              transform: translateY(2px); /* Slightly push the button down on click */
-//             }
-// 		</style> -->
+      {/* Navigation Buttons */}
+      <div className="mt-8">
+        <button
+          onClick={() => navigate("/")}
+          className="px-6 py-3 bg-green-500 hover:bg-green-600 rounded-full shadow-lg text-lg font-bold"
+        >
+          Return to Home
+        </button>
+      </div>
+    </div>
+  );
+}
